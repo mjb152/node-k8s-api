@@ -1,0 +1,30 @@
+{
+    "namespaces": [
+        {
+            "id": 1,
+            "name": "ns 1"
+        },
+        {
+            "id": 2,
+            "name": "ns 2"
+        },
+        {
+            "id": 3,
+            "name": "ns 3"
+        }
+    ],
+    "pods": [
+        {
+            "id": 1,
+            "name": "pod1"
+        },
+        {
+            "id": 2,
+            "name": "pod2"
+        },
+        {
+            "id": 3,
+            "name": "pod3"
+        }
+    ]
+}
