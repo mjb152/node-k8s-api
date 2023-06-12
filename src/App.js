@@ -6,7 +6,6 @@ import { Context } from './context'
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 function App() {
-  const [podlist, getPodlist] = useState([{id: 1, name: 'pod1'},{id: 2, name: 'pod2'}]) // xxx change this
   const [namespaces, setNamespaces] = useState([]);
 
   // websocket 
@@ -35,28 +34,24 @@ function App() {
     }
   }, [lastMessage, nsetMessageHistory]);
 
-  //console.log({namespaces},"Starting")
-  useEffect(() => {
-
-  }, [podlist])
 
   function startWebsockets(e) {
     //alert("starting")
-    console.log({podlist},"Starting button pushed");
+    //console.log({podlist},"Starting button pushed");
     setNamespaces([{id: 1, name: 'pod1'}]);
   }
   
   const connClosed = { color: 'black', background: 'red'}
   const connOpen = { color: 'blue', background: 'white'}
 
+  // <PodList podlist={podlist}/>
   return (
     <>
       <span>The NS WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span><br></br>
-      <span>The Pods WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span><br></br>
       <button onClick={startWebsockets}>Start</button>
       <Context.Provider value={namespaces}>
         <NamespaceSelect />
-        <PodList podlist={podlist}/>
+        <PodList />
       </Context.Provider>
 
       <br/>
