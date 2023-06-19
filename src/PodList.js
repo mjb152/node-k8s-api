@@ -3,10 +3,10 @@ import { Pod } from './Pod';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 export function PodList() {
-    //const [podlist, setPodlist] = useState([{id: 1, name: 'pod1'},{id: 2, name: 'pod2'},{id: 3, name: 'pod3'}]) // xxx change this
-    const [podlist, setPodlist] = useState([]);
 
-    // websocket 
+    const [allPods, setallPods] = useState(new Map());
+
+    // websocket .. lastMessage receives all Pod update messages, all we're going to do is to alter a unique Map with the Pod ID
     const [psocketUrl, psetSocketUrl] = useState('ws://localhost:8080/ws/pods');
     const { sendMessage, lastMessage, readyState } = useWebSocket(psocketUrl, {
         //Will attempt to reconnect on all close events, such as server shutting down
@@ -22,42 +22,15 @@ export function PodList() {
 
     useEffect(() => {
         if (lastMessage !== null) { 
+            // {name: 'ppp', namespace: 'default', id: '04cb9458-4a17-4e45-86d8-5e7bf32e1320', status: 'Terminating', action: 'add'}
             const data = JSON.parse(lastMessage.data)
             console.log(data,"Pods update received - " + data.status + " " + data.action);
             if (data.action == "add") {
                 console.log("Pods added "+data.name);
-                //const copyOfPodlist = [...podlist];
+                
+                setallPods(new Map(allPods.set(data.id,data))); // we need a new Map, so react re-renders
 
-                switch (data.status) {
-                    case "Running":
-                        console.log("Pods Running "+data.name);
-                        setPodlist(podlist => [...podlist, data]);     
-                        break;
-                        case "Terminating":
-                            console.log("Pods Terminating "+data.name);
-                            break;    
-                }
-
-                // setPodlist(podlist => [...podlist, data]);
-                //         podlist.forEach(item => {
-                //             console.log("Item " + item.id + " Name " + item.name );
-                //         }
-                if (data.status == "Terminating") {
-                    //console.log("Pods Terminating "+data.name);
-                }
-                if (data.status == "Pending") {
-                    console.log("Pods Pending "+data.name);
-                }
-                if (data.status == "ContainerCreating") {
-                    //console.log("Pods ContainerCreating "+data.name);
-                }
-
-
-
-                // setPodlist(podlist => ({
-                //     ...podlist,
-                //     ...data
-                // }));
+                console.log(allPods,"All pods")
                 //Pending
                 //Terminating
                 //ContainerCreating
@@ -67,13 +40,12 @@ export function PodList() {
             }
 
             if (data.action == "delete"){
-                //console.log("Pods deleted "+data.name);
-                // let copyOfPodlist = [...podlist]
-                // delete copyOfPodlist[data.id]
-                // console.log("Pods OLD deleted "+JSON.stringify(podlist));
-                // console.log("Pods NEW deleted "+JSON.stringify(copyOfPodlist));
-                //setPodlist( podlist => [...copyOfPodlist]);
-                //setPodlist([...podlist, podlist.find(i => !podlist.includes(i))]);
+                // Map.delete returns True/False,  so this technique make a copied of the altered data,  then sets it
+                let prev = new Map(allPods);
+                prev.delete(data.id);
+                setallPods(prev);
+                
+                console.log(allPods,"All pods after delete")
             }
         }
       }, [lastMessage]);
@@ -82,26 +54,26 @@ export function PodList() {
     const connOpen = { color: 'blue', background: 'white'}
     
     function showData(e) {
-        //alert("starting")
-        console.log({podlist},"Starting button pushed");
-        //setNamespaces([{id: 1, name: 'pod1'}]);
-      }
+        console.log("Starting button pushed");
+    }
 
+    //{[...allPods.keys()].map( k => (
+    //    <li key={k}>xx {allPods.get(k).name} -  {allPods.get(k).status} {allPods.get(k).action}</li>
+    //    ))}
     return (
         <>
             <br></br><span>The Pods WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span><br></br>
-            {podlist.map(pod => {
-                if (pod.id) {
-                    return <Pod key={pod.id} pod={pod}/>
-                }
-                
-            })}
+        
+            <ul>
+                {Array.from(allPods.keys()).map((pod,idx) => (
+                    <li key={pod}>xx {allPods.get(pod).name} -  {allPods.get(pod).status} {allPods.get(pod).action}</li>
+                ))}
+            </ul>
             
             <button onClick={showData}>List Pods</button>
             <br/>
             <br/>
 
         </>
-        
     )
 }
