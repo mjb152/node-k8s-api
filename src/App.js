@@ -47,22 +47,12 @@ function App() {
   // <PodList podlist={podlist}/>
   return (
     <>
-      <span>The NS WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span><br></br>
       <button onClick={startWebsockets}>Start</button>
+      <span>The NS WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span><br></br>
       <Context.Provider value={namespaces}>
         <NamespaceSelect />
         <PodList />
       </Context.Provider>
-
-      <br/>
-      <div>
-        {lastMessage ? <span>Last NS message: {lastMessage.data}</span> : null}
-        <ul>
-          {nmessageHistory.map((message, idx) => (
-            <span key={idx}>{message ? message.data : null}</span>
-          ))}
-        </ul>
-      </div>
     </>
     
   )

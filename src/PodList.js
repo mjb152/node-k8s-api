@@ -3,12 +3,11 @@ import { Pod } from './Pod';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 export function PodList() {
-    const [podlist, getPodlist] = useState([{id: 1, name: 'pod1'},{id: 2, name: 'pod2'},{id: 3, name: 'pod3'}]) // xxx change this
 
+    const [allPods, setallPods] = useState(new Map());
 
-    // websocket 
+    // websocket .. lastMessage receives all Pod update messages, all we're going to do is to alter a unique Map with the Pod ID
     const [psocketUrl, psetSocketUrl] = useState('ws://localhost:8080/ws/pods');
-    const [pmessageHistory, psetMessageHistory] = useState([]);
     const { sendMessage, lastMessage, readyState } = useWebSocket(psocketUrl, {
         //Will attempt to reconnect on all close events, such as server shutting down
         shouldReconnect: (closeEvent) => true,
@@ -20,38 +19,61 @@ export function PodList() {
         [ReadyState.CLOSED]: 'Closed',
         [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
     }[readyState];
-    
-    useEffect(() => {
-
-    }, [podlist])
 
     useEffect(() => {
-        if (lastMessage !== null) {
-          psetMessageHistory((prev) => prev.concat(lastMessage));
-          console.log(lastMessage,"Pods update received");   
+        if (lastMessage !== null) { 
+            // {name: 'ppp', namespace: 'default', id: '04cb9458-4a17-4e45-86d8-5e7bf32e1320', status: 'Terminating', action: 'add'}
+            const data = JSON.parse(lastMessage.data)
+            console.log(data,"Pods update received - " + data.status + " " + data.action);
+            if (data.action == "add") {
+                console.log("Pods added "+data.name);
+                
+                setallPods(new Map(allPods.set(data.id,data))); // we need a new Map, so react re-renders
+
+                console.log(allPods,"All pods")
+                //Pending
+                //Terminating
+                //ContainerCreating
+                //Running
+                //ErrImagePull
+                //ImagePullBackOff
+            }
+
+            if (data.action == "delete"){
+                // Map.delete returns True/False,  so this technique make a copied of the altered data,  then sets it
+                let prev = new Map(allPods);
+                prev.delete(data.id);
+                setallPods(prev);
+                
+                console.log(allPods,"All pods after delete")
+            }
         }
-      }, [lastMessage, psetMessageHistory]);
+      }, [lastMessage]);
 
     const connClosed = { color: 'black', background: 'red'}
     const connOpen = { color: 'blue', background: 'white'}
     
+    function showData(e) {
+        console.log("Starting button pushed");
+    }
+
+    //{[...allPods.keys()].map( k => (
+    //    <li key={k}>xx {allPods.get(k).name} -  {allPods.get(k).status} {allPods.get(k).action}</li>
+    //    ))}
     return (
         <>
             <br></br><span>The Pods WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span><br></br>
-            {podlist.map(pod => {
-                return <Pod key={pod.id} pod={pod}/>
-            })};
-            <br/>
-      <div>
-        {lastMessage ? <span>Last POD message: {lastMessage.data}</span> : null}
-        <br></br><span>Pod History</span>
-        <ul>
-          {pmessageHistory.map((message, idx) => (
-            <span key={idx}>{message ? message.data : null}</span>
-          ))}
-        </ul>
-      </div>
-        </>
         
+            <ul>
+                {Array.from(allPods.keys()).map((pod,idx) => (
+                    <li key={pod}>xx {allPods.get(pod).name} -  {allPods.get(pod).status} {allPods.get(pod).action}</li>
+                ))}
+            </ul>
+            
+            <button onClick={showData}>List Pods</button>
+            <br/>
+            <br/>
+
+        </>
     )
 }
