@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Pod } from './Pod';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+import CardGroup from 'react-bootstrap/CardGroup';
+import style from "./PodList.module.css";
 
 export function PodList() {
 
@@ -31,12 +35,6 @@ export function PodList() {
                 setallPods(new Map(allPods.set(data.id,data))); // we need a new Map, so react re-renders
 
                 console.log(allPods,"All pods")
-                //Pending
-                //Terminating
-                //ContainerCreating
-                //Running
-                //ErrImagePull
-                //ImagePullBackOff
             }
 
             if (data.action == "delete"){
@@ -60,20 +58,22 @@ export function PodList() {
     //{[...allPods.keys()].map( k => (
     //    <li key={k}>xx {allPods.get(k).name} -  {allPods.get(k).status} {allPods.get(k).action}</li>
     //    ))}
+
+    // <li key={pod}>xx {allPods.get(pod).name} -  {allPods.get(pod).status} {allPods.get(pod).action}</li>
+    //<button onClick={showData}>List Pods</button>
     return (
         <>
             <br></br><span>The Pods WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span><br></br>
         
-            <ul>
+            <div className={style.container}>
                 {Array.from(allPods.keys()).map((pod,idx) => (
-                    <li key={pod}>xx {allPods.get(pod).name} -  {allPods.get(pod).status} {allPods.get(pod).action}</li>
+                    <Pod key={pod} pod={allPods.get(pod)}/>
                 ))}
-            </ul>
-            
-            <button onClick={showData}>List Pods</button>
+            </div>
+                 
+            <Button variant="primary">Primary</Button>{' '}
             <br/>
             <br/>
-
         </>
     )
 }
