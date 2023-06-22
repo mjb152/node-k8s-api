@@ -63,7 +63,8 @@ export function PodList() {
     //<button onClick={showData}>List Pods</button>
     return (
         <>
-            <br></br><span>The Pods WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span><br></br>
+            <span>The Pods WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span>
+            <span></span>
         
             <div className={style.container}>
                 {Array.from(allPods.keys()).map((pod,idx) => (

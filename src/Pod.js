@@ -55,7 +55,7 @@ export function Pod({ pod }) {
     return (  
         <> 
         <Card className={podColor} style={{ width: "12rem" }}>
-            <Card.Img variant="top" src="k8s3.png"/>
+            <Card.Img variant="top" src="k8s3.png" style={{ width:"120px",height:"auto" }}/>
             <Card.Body>
                 <Card.Title>{pod.name}</Card.Title>
                 <Card.Text>{pod.status}</Card.Text>

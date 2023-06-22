@@ -1,6 +1,7 @@
 import "./styles.css";
 import { useContext } from "react";
-import { Context } from './context'
+import { Context } from './context';
+import NavDropdown from 'react-bootstrap/NavDropdown';
 
 // useeffect on startup []
 // open a websocket and call a list of namespaces
@@ -12,18 +13,15 @@ export function NamespaceSelect() {
   //console.log(namespaces,"Namespace module rendered");
   //</><select onChange={(e) => setNsChoice(e.target.value)}>
   return (<>
-        
-        <select>
-          <option>** Choose a namespace **</option>
-          <option>ALL</option>
-          {
-             namespaces.map( 
-                (opts,i)=>{
-                  return(<option key={i}>{opts.name}</option>)
-                }
-             )
-          }
-        </select>
+      <NavDropdown title="Namespace" id="basic-nav-dropdown">
+        {
+          namespaces.map( 
+            (opts,i)=>{
+              return(<NavDropdown.Item href="#" key={i}>{opts.name} </NavDropdown.Item>)
+            }
+          )
+        }  
+      </NavDropdown>
     </>
   );
 }

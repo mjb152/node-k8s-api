@@ -4,6 +4,8 @@ import { PodList } from './PodList'
 import { NamespaceSelect } from './NamespaceSelect'
 import { Context } from './context'
 import useWebSocket, { ReadyState } from 'react-use-websocket';
+import Container from 'react-bootstrap/Container';
+import Navbar from 'react-bootstrap/Navbar';
 
 function App() {
   const [namespaces, setNamespaces] = useState([]);
@@ -45,16 +47,33 @@ function App() {
   const connOpen = { color: 'blue', background: 'white'}
 
   // <PodList podlist={podlist}/>
+  //<button onClick={startWebsockets}>Start</button>
   return (
     <>
-      <button onClick={startWebsockets}>Start</button>
-      <span>The NS WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span><br></br>
-      <Context.Provider value={namespaces}>
-        <NamespaceSelect />
-        <PodList />
-      </Context.Provider>
-    </>
-    
+      <Navbar bg="light">
+        <Container>
+          <Navbar.Brand href="#home">
+            <img
+              src="lseg.png"
+              width="150"
+              height="auto"
+              className="d-inline-block align-top"
+              alt="React Bootstrap logo"
+            />
+          </Navbar.Brand>
+          <Navbar.Text>Kubernetes API demo </Navbar.Text>
+          <Context.Provider value={namespaces}>
+          <NamespaceSelect />
+          </Context.Provider>
+        </Container>
+      </Navbar>
+      <Container fluid="xxl">
+        <span>The NS WebSocket is currently <span style={connectionStatus==='Closed' ? connClosed : connOpen}>{connectionStatus}</span></span><br></br>
+        <Context.Provider value={namespaces}>
+          <PodList />
+        </Context.Provider>
+      </Container>
+    </>   
   )
 }
 
